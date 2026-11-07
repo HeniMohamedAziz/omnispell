@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OMNISPELL</title>
+    <link rel="icon" type="image/x-icon" href="assets/icon.ico">
+    <link rel="icon" type="image/svg+xml" href="assets/icon.svg">
+    <link rel="stylesheet" href="style/omnispell.css">
+</head>
+<body>
+
+    <div id="profile-login-screen" class="login-screen">
+        <div class="login-top-bar">
+            <div class="brand-block">
+                <div class="brand-text-title">OMNI<span class="brand-spell">SPELL</span></div>
+            </div>
+            <button type="button" class="theme-toggle" id="login-theme-toggle-btn" title="Toggle Dark / Light Mode">◐</button>
+        </div>
+
+        <div class="login-container">
+            <h1 class="login-heading">Select Profile</h1>
+            <p class="login-sub">Choose your profile to log in, or click <strong>+</strong> to create a new one.</p>
+
+            <div class="login-profiles-grid" id="login-profiles-grid"></div>
+        </div>
+
+        <div class="modal-backdrop" id="create-profile-modal">
+            <div class="modal-window" style="max-width: 480px;">
+                <div class="modal-header">
+                    <div class="modal-title">New Profile</div>
+                    <button type="button" class="btn btn-outline btn-sm" id="close-create-profile-modal-btn">✕</button>
+                </div>
+
+                <form id="create-profile-form">
+                    <div class="field">
+                        <label>Username *</label>
+                        <input type="text" id="new-prof-name" placeholder="Enter username..." required>
+                    </div>
+                    <div class="field">
+                        <label>Password *</label>
+                        <input type="password" id="new-prof-password" placeholder="Password" required>
+                    </div>
+                    <div class="field">
+                        <label>Language *</label>
+                        <select id="new-prof-lang" required>
+                            <option value="en">English</option>
+                            <option value="fr">French</option>
+                            <option value="de">German</option>
+                            <option value="it">Italian</option>
+                            <option value="es">Spanish</option>
+                        </select>
+                    </div>
+                    <div class="field">
+                        <label>Target Test (Optional)</label>
+                        <select id="new-prof-test">
+                            <option value="none" selected>None</option>
+                            <option value="ielts">IELTS</option>
+                            <option value="toefl">TOEFL</option>
+                            <option value="cambridge">Cambridge</option>
+                        </select>
+                    </div>
+                    <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:24px;">
+                        <button type="button" class="btn btn-outline" id="cancel-new-profile-btn">Cancel</button>
+                        <button type="submit" class="btn">Create &amp; Log In</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="modal-backdrop" id="password-login-modal">
+            <div class="modal-window" style="max-width: 420px;">
+                <div class="modal-header">
+                    <div class="modal-title" id="login-modal-profile-title">Log In</div>
+                    <button type="button" class="btn btn-outline btn-sm" id="close-password-modal-btn">✕</button>
+                </div>
+
+                <form id="password-login-form">
+                    <div class="field">
+                        <label id="login-password-label">Password</label>
+                        <input type="password" id="login-password-input" placeholder="Enter password..." required>
+                        <div id="login-password-error" style="display:none; margin-top:8px; font-size:12px; font-weight:800; color:#dc2626;">
+                            Incorrect password.
+                        </div>
+                    </div>
+                    <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:20px;">
+                        <button type="button" class="btn btn-outline" id="cancel-password-modal-btn">Cancel</button>
+                        <button type="submit" class="btn">Log In</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="modal-backdrop" id="delete-profile-modal">
+            <div class="modal-window" style="max-width: 420px;">
+                <div class="modal-header">
+                    <div class="modal-title" id="delete-modal-profile-title">Delete Profile</div>
+                    <button type="button" class="btn btn-outline btn-sm" id="close-delete-modal-btn">✕</button>
+                </div>
+
+                <form id="delete-profile-form">
+                    <p style="font-size:13px; margin-bottom:14px; color:var(--subtle);" id="delete-modal-desc">
+                        Are you sure you want to delete this profile?
+                    </p>
+                    <div class="field" id="delete-password-field">
+                        <label>Confirm Password</label>
+                        <input type="password" id="delete-password-input" placeholder="Enter profile password...">
+                        <div id="delete-password-error" style="display:none; margin-top:8px; font-size:12px; font-weight:800; color:#dc2626;">
+                            Incorrect password.
+                        </div>
+                    </div>
+                    <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:20px;">
+                        <button type="button" class="btn btn-outline" id="cancel-delete-modal-btn">Cancel</button>
+                        <button type="submit" class="btn state-wrong">Delete Profile</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div id="countdown-overlay" class="countdown-overlay" style="display:none;">
+        <div class="countdown-number" id="countdown-number">1</div>
+    </div>
+
+    <div id="app-shell" style="display:none;">
+
+        <header class="site-header">
+            <div class="header-inner">
+                <div class="brand-block" id="brand-home-btn">
+                    <div class="brand-text-title">OMNI<span class="brand-spell">SPELL</span></div>
+                </div>
+
+                <nav class="nav-inline">
+                    <button type="button" class="nav-btn active" data-view="dashboard">Home</button>
+                    <button type="button" class="nav-btn" data-view="arena">Practice</button>
+                    <button type="button" class="nav-btn" data-view="lists">Word Lists</button>
+                    <button type="button" class="nav-btn" data-view="settings">Settings</button>
+                </nav>
+
+                <div class="header-actions">
+                    <span class="logged-user-pill" id="header-profile-label">Profile</span>
+                    <button type="button" class="btn btn-outline btn-sm" id="logout-profile-btn" style="height:40px;">Log Out</button>
+                    <button type="button" class="theme-toggle" id="theme-toggle-btn" title="Dark / Light Mode">◐</button>
+                </div>
+            </div>
+        </header>
+
+        <main class="container">
+
+            <div id="view-dashboard" class="view-section active">
+
+                <div class="stats-grid-3">
+                    <div class="stat-card">
+                        <div class="stat-label">Mastered Words</div>
+                        <div class="stat-value" id="stat-mastered-count">0 / 0</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Hard Words (Mistakes)</div>
+                        <div class="stat-value" id="stat-debt-count">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Accuracy</div>
+                        <div class="stat-value" id="stat-flawless-rate">0%</div>
+                    </div>
+                </div>
+                <section>
+                    <div class="mode-header-row">
+                        <div class="sh" style="margin-bottom:0; flex:1;">Choose A Mode To Start</div>
+                        <div class="list-picker-bar">
+                            <select class="list-picker-select word-list-selector" id="dashboard-list-select"></select>
+                        </div>
+                    </div>
+                    <div class="modes-grid-3">
+                        <div class="mode-select-card">
+                            <div>
+                                <div class="list-title">1. Follow The Sound</div>
+                                <p class="list-desc">Listen to the word spoken out loud and type the exact spelling from sound alone.</p>
+                            </div>
+                            <button type="button" class="btn start-mode-btn" data-mode="2">Start Sound Mode →</button>
+                        </div>
+
+                        <div class="mode-select-card">
+                            <div>
+                                <div class="list-title">2. Guess The Word</div>
+                                <p class="list-desc">Read the definition and letter pattern (first letter &amp; length), then spell the word.</p>
+                            </div>
+                            <button type="button" class="btn start-mode-btn" data-mode="3">Start Guess Mode →</button>
+                        </div>
+
+                        <div class="mode-select-card">
+                            <div>
+                                <div class="list-title">3. Complete Sentence</div>
+                                <p class="list-desc">Read the sentence with a missing blank and its meaning, then spell the missing word.</p>
+                            </div>
+                            <button type="button" class="btn start-mode-btn" data-mode="1">Start Sentence Mode →</button>
+                        </div>
+                    </div>
+                </section>
+                <section>
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+                        <div class="sh" style="margin-bottom:0; flex:1;">Words To Master (Spell 3x Consecutive To Remove)</div>
+                        <button type="button" class="btn btn-outline btn-sm" id="start-debt-session-btn" style="margin-left:16px;">
+                            Master Mistakes (<span id="btn-debt-count">0</span>)
+                        </button>
+                    </div>
+                    <div class="brutalist-table-wrap">
+                        <table class="brutalist-table">
+                            <thead>
+                                <tr>
+                                    <th>Word</th>
+                                    <th>Your Last Mistake</th>
+                                    <th>3x Consecutive Progress</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="nemesis-table-body"></tbody>
+                        </table>
+                    </div>
+                </section>
+            </div>
+
+            <div id="view-arena" class="view-section">
+
+                <div id="arena-mode-selector">
+                    <div class="mode-header-row">
+                        <div class="sh" style="margin-bottom:0; flex:1;">Select A Practice Mode</div>
+                        <div class="list-picker-bar">
+                            <select class="list-picker-select word-list-selector" id="arena-list-select"></select>
+                        </div>
+                    </div>
+                    <div class="modes-grid-3" style="margin-bottom:24px;">
+                        <div class="mode-select-card">
+                            <div>
+                                <div class="list-title">1. Follow The Sound</div>
+                                <p class="list-desc">Word is read out loud. Listen carefully and type the exact spelling.</p>
+                            </div>
+                            <button type="button" class="btn start-mode-btn" data-mode="2">Launch Sound Mode →</button>
+                        </div>
+
+                        <div class="mode-select-card">
+                            <div>
+                                <div class="list-title">2. Guess The Word</div>
+                                <p class="list-desc">No audio. Use the definition and letter pattern slots to spell the word.</p>
+                            </div>
+                            <button type="button" class="btn start-mode-btn" data-mode="3">Launch Guess Mode →</button>
+                        </div>
+
+                        <div class="mode-select-card">
+                            <div>
+                                <div class="list-title">3. Complete Sentence</div>
+                                <p class="list-desc">No audio. Read the context sentence and definition to fill in the missing blank.</p>
+                            </div>
+                            <button type="button" class="btn start-mode-btn" data-mode="1">Launch Sentence Mode →</button>
+                        </div>
+                    </div>
+
+                    <div class="form-box" style="display:flex; justify-content:space-between; align-items:center; gap:16px; flex-wrap:wrap;">
+                        <div>
+                            <div class="list-title" style="margin-bottom:4px;">Words To Master Drill (3x Consecutive)</div>
+                            <p class="list-desc" style="margin-bottom:0;">Practice the words you missed. Spell a word right 3 times in a row to remove it from your mistakes list (missing once resets the 3-count).</p>
+                        </div>
+                        <button type="button" class="btn btn-outline" id="arena-start-debt-btn">
+                            Master Mistakes (<span id="arena-debt-count">0</span>) →
+                        </button>
+                    </div>
+                </div>
+                <div id="arena-session-container" style="display:none;">
+                    <div class="arena-top-controls">
+                        <div class="locked-mode-pill" id="arena-locked-mode-badge">MODE: 1. FOLLOW THE SOUND</div>
+                        <div style="display:flex; align-items:center; gap:12px;">
+                            <span class="mono" style="font-size:13px; font-weight:800;" id="arena-progress-text">1 / 15</span>
+                            <button type="button" class="btn btn-outline btn-sm" id="arena-exit-btn">Exit Mode</button>
+                        </div>
+                    </div>
+                    <input type="hidden" id="arena-mode-override" value="2">
+
+                    <div class="arena-card" id="arena-active-card">
+                        <div class="arena-instruction-bar">
+                            <span id="arena-facing-title">LISTEN AND SPELL THE WORD</span>
+                            <div style="display:flex; gap:8px; align-items:center;">
+                                <span class="badge mono" id="arena-streak-pill" style="display:none;">CONSECUTIVE: 0 / 3</span>
+                                <div id="arena-audio-controls" style="display:flex; gap:8px;">
+                                    <button type="button" class="btn btn-outline btn-sm" id="arena-play-audio-btn">Hear Word</button>
+                                    <button type="button" class="btn btn-outline btn-sm" id="arena-slow-audio-btn">Slow</button>
+                                </div>
+                                <button type="button" class="btn btn-outline btn-sm" id="arena-hint-btn">Hint</button>
+                            </div>
+                        </div>
+                        <div class="arena-prompt-box" id="arena-prompt-box">
+                            <div id="arena-context-block" style="margin-bottom:14px;">
+                                <div class="prompt-context" id="arena-context-text"> - </div>
+                            </div>
+
+                            <div id="arena-definition-block">
+                                <div class="prompt-definition" id="arena-definition-text"> - </div>
+                            </div>
+
+                            <div id="arena-pattern-block" style="margin-top:12px; display:none;">
+                                <div class="pattern-slots mono" id="arena-pattern-text"></div>
+                            </div>
+                        </div>
+                        <div id="arena-clue-block" class="arena-hint-bar">
+                            <span id="arena-clue-text"></span>
+                        </div>
+                        <form id="arena-spell-form" autocomplete="off" spellcheck="false">
+                            <input
+                                type="text"
+                                id="arena-spell-input"
+                                class="spell-input"
+                                placeholder="Type the word and press Enter..."
+                                autocomplete="off"
+                                autocorrect="off"
+                                autocapitalize="off"
+                                spellcheck="false"
+                            >
+                            <div class="arena-action-row">
+                                <span class="mono inline-status-msg" id="inline-feedback-msg">Thinking: 0.0s</span>
+                                <button type="submit" class="btn" id="arena-submit-btn">Check [Enter]</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div id="view-lists" class="view-section">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px; padding-bottom:16px; border-bottom:2px solid var(--fg); flex-wrap:wrap; gap:12px;">
+                    <h2 style="font-size:24px; font-weight:900; text-transform:uppercase;" id="lists-view-heading">Word Lists</h2>
+                    <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                        <button type="button" class="btn btn-outline btn-sm" id="download-template-csv-btn">⬇ CSV Template</button>
+                        <label class="btn btn-outline btn-sm" style="cursor:pointer;">
+                            Import List
+                            <input type="file" id="import-list-file-input" accept=".json,.csv" style="display:none;">
+                        </label>
+                        <button type="button" class="btn btn-sm" id="toggle-create-list-btn">+ New Word List</button>
+                    </div>
+                </div>
+                <div class="form-box" id="create-list-panel" style="display:none; margin-bottom:32px;">
+                    <div class="sh">Create Custom Word List</div>
+                    <form id="create-list-form">
+                        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:14px;">
+                            <div class="field">
+                                <label>List Title *</label>
+                                <input type="text" id="new-list-title" placeholder="e.g., My IELTS Words" required>
+                            </div>
+                            <div class="field">
+                                <label>Description</label>
+                                <input type="text" id="new-list-desc" placeholder="Short description">
+                            </div>
+                        </div>
+                        <input type="hidden" id="new-list-lang">
+                        <input type="hidden" id="new-list-test" value="general">
+
+                        <div class="sh" style="margin-top:16px;">Words (Word + Definition Required)</div>
+                        <div id="custom-words-builder-rows"></div>
+
+                        <div style="display:flex; justify-content:space-between; margin-top:14px;">
+                            <button type="button" class="btn btn-outline btn-sm" id="add-builder-word-row-btn">+ Add Row</button>
+                            <div style="display:flex; gap:10px;">
+                                <button type="button" class="btn btn-outline btn-sm" id="cancel-create-list-btn">Cancel</button>
+                                <button type="submit" class="btn btn-sm">Save List</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="lists-grid" id="scoped-lists-grid"></div>
+                <section id="list-inspector-section" style="margin-top:36px; display:none;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+                        <div class="sh" style="margin-bottom:0; flex:1;" id="inspector-list-title">Words</div>
+                        <div style="display:flex; gap:8px; margin-left:16px;">
+                            <button type="button" class="btn btn-sm" id="inspector-add-word-toggle-btn">+ Add Word</button>
+                            <button type="button" class="btn btn-outline btn-sm" id="inspector-close-btn">Close</button>
+                        </div>
+                    </div>
+
+                    <form id="quick-add-word-form" class="form-box" style="display:none; margin-bottom:20px;">
+                        <div style="display:grid; grid-template-columns: 1fr 2fr; gap:12px;">
+                            <div class="field">
+                                <label>Word *</label>
+                                <input type="text" id="qa-word" required>
+                            </div>
+                            <div class="field">
+                                <label>Definition *</label>
+                                <input type="text" id="qa-def" required>
+                            </div>
+                        </div>
+                        <div class="field">
+                            <label>Example Sentence (Use _____ for the word)</label>
+                            <input type="text" id="qa-context">
+                        </div>
+                        <input type="hidden" id="qa-pos" value="word">
+                        <input type="hidden" id="qa-trap" value="">
+                        <button type="submit" class="btn btn-sm">Save Word</button>
+                    </form>
+
+                    <div class="brutalist-table-wrap">
+                        <table class="brutalist-table">
+                            <thead>
+                                <tr>
+                                    <th>Sound</th>
+                                    <th>Word</th>
+                                    <th>Definition</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="inspector-words-tbody"></tbody>
+                        </table>
+                    </div>
+                </section>
+            </div>
+
+            <div id="view-settings" class="view-section">
+                <div class="mode-header-row">
+                    <div class="sh" style="margin-bottom:0; flex:1;">Settings</div>
+                    <div style="display:flex; align-items:center; gap:10px;">
+                        <span id="settings-save-status" class="mono" style="font-size:12px; font-weight:800;">✓ Saved</span>
+                        <button type="button" class="btn btn-sm" id="save-all-settings-btn">Save Settings</button>
+                    </div>
+                </div>
+
+                <form id="settings-calibration-form" class="modes-grid-3">
+                    <div class="form-box">
+                        <div class="sh">Practice &amp; Session</div>
+
+                        <div class="field-row-2">
+                            <div class="field">
+                                <label>Words Per Session</label>
+                                <select id="set-session-size">
+                                    <option value="5">5 Words</option>
+                                    <option value="10">10 Words</option>
+                                    <option value="15" selected>15 Words</option>
+                                    <option value="25">25 Words</option>
+                                    <option value="50">50 Words</option>
+                                    <option value="100">100 Words</option>
+                                    <option value="ALL">Full List (All Words)</option>
+                                </select>
+                            </div>
+                            <div class="field">
+                                <label>Start Countdown</label>
+                                <select id="set-countdown-sec">
+                                    <option value="3" selected>3 Seconds (1 → 2 → 3)</option>
+                                    <option value="1">1 Second</option>
+                                    <option value="0">Off (Instant)</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="field">
+                            <label>Word Order</label>
+                            <select id="set-word-order">
+                                <option value="shuffle" selected>Random Shuffle</option>
+                                <option value="unmastered_first">Unmastered Words First</option>
+                                <option value="sequential">List Order (Sequential)</option>
+                            </select>
+                        </div>
+
+                        <div class="field-row-2">
+                            <div class="field">
+                                <label>After Correct Answer</label>
+                                <select id="set-auto-advance">
+                                    <option value="manual" selected>Press Enter Manually</option>
+                                    <option value="auto">Auto-Next Word</option>
+                                </select>
+                            </div>
+                            <div class="field">
+                                <label>Hint Button</label>
+                                <select id="set-allow-hints">
+                                    <option value="yes" selected>Show Hint Button</option>
+                                    <option value="no">Hide Hint Button</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="field" style="margin-bottom:0;">
+                            <label>Max Thinking Time (ms)</label>
+                            <input type="number" id="set-ttft-ms" min="800" max="10000" step="100" value="2500">
+                        </div>
+                        <input type="hidden" id="set-retype-count" value="1">
+                        <input type="hidden" id="set-char-speed-ms" value="320">
+                        <input type="hidden" id="set-debt-penalty" value="3">
+                    </div>
+                    <div class="form-box">
+                        <div class="sh">Voice &amp; Audio</div>
+
+                        <div class="field">
+                            <label>Accent</label>
+                            <select id="set-voice-accent">
+                                <option value="en-GB">British English (IELTS)</option>
+                                <option value="en-US">American English</option>
+                                <option value="en-AU">Australian English</option>
+                            </select>
+                        </div>
+
+                        <div class="field">
+                            <label>System Voice</label>
+                            <select id="set-system-voice-uri"></select>
+                        </div>
+
+                        <div class="field-row-2">
+                            <div class="field">
+                                <label>Normal Speed</label>
+                                <select id="set-voice-rate">
+                                    <option value="0.82">0.82x (Relaxed)</option>
+                                    <option value="0.95" selected>0.95x (Default)</option>
+                                    <option value="1.08">1.08x (Fast)</option>
+                                </select>
+                            </div>
+                            <div class="field">
+                                <label>Slow Button Speed</label>
+                                <select id="set-voice-slow-rate">
+                                    <option value="0.58">0.58x (Extra Slow)</option>
+                                    <option value="0.72" selected>0.72x (Default)</option>
+                                    <option value="0.82">0.82x (Mild Slow)</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="field" style="margin-bottom:0;">
+                            <label>Test Voice</label>
+                            <div style="display:flex; gap:8px;">
+                                <input type="text" id="set-voice-sample-input" value="accommodation" placeholder="Word to test...">
+                                <button type="button" class="btn btn-outline btn-sm" id="test-voice-btn">Hear</button>
+                                <button type="button" class="btn btn-outline btn-sm" id="test-voice-slow-btn">Slow</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-box">
+                        <div class="sh">Profile &amp; Data</div>
+
+                        <div class="field-row-2">
+                            <div class="field">
+                                <label>Profile Name</label>
+                                <input type="text" id="set-prof-name" placeholder="Your name">
+                            </div>
+                            <div class="field">
+                                <label>Target Exam</label>
+                                <select id="set-prof-test">
+                                    <option value="ielts">IELTS</option>
+                                    <option value="toefl">TOEFL</option>
+                                    <option value="cambridge">Cambridge</option>
+                                    <option value="none">General / None</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="field-row-2">
+                            <div class="field">
+                                <label>Password</label>
+                                <input type="password" id="set-prof-password" placeholder="Password">
+                            </div>
+                            <div class="field">
+                                <label>Theme</label>
+                                <select id="set-theme-mode">
+                                    <option value="light">Light Mode</option>
+                                    <option value="dark">Dark Mode</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="field">
+                            <label>Backup</label>
+                            <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                                <button type="button" class="btn btn-outline btn-sm" id="export-backup-btn">⬇ Export Backup</button>
+                                <label class="btn btn-outline btn-sm" style="cursor:pointer; margin:0;">
+                                    ⬆ Import Backup
+                                    <input type="file" id="import-backup-input" accept=".json" style="display:none;">
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="field" style="margin-bottom:0;">
+                            <label>Progress Reset</label>
+                            <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                                <button type="button" class="btn btn-outline btn-sm" id="clear-mistakes-btn">Clear Mistakes</button>
+                                <button type="button" class="btn btn-outline btn-sm" id="reset-profile-progress-btn">Reset All Progress</button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+        </main>
+    </div>
+
+    <script src="data/builtin_lists.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
