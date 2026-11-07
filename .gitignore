@@ -1,0 +1,8 @@
+node_modules/
+omnispell_local_db.json
+*.lnk
+*.log
+.DS_Store
+Thumbs.db
+dist/
+out/

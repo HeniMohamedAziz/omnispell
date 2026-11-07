@@ -1,0 +1,23 @@
+{
+  "name": "omnispell",
+  "version": "1.0.0",
+  "description": "Offline desktop spelling and vocabulary trainer focused on IELTS English and CEFR (A1-C2) mastery.",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "serve": "node server.js"
+  },
+  "keywords": [
+    "ielts",
+    "english",
+    "spelling",
+    "vocabulary",
+    "cefr",
+    "omnispell"
+  ],
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^33.2.0"
+  },
+  "author": "Mohamed Aziz Heni"
+}

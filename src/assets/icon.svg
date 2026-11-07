@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+  <rect width="256" height="256" fill="#000000"/>
+  <text x="128" y="182" text-anchor="middle" font-family="Arial Black, Impact, sans-serif" font-weight="900" font-size="148" letter-spacing="-4">
+    <tspan fill="#ffffff">O</tspan><tspan fill="#2563eb">S</tspan>
+  </text>
+</svg>
